@@ -16,11 +16,27 @@ To conclude the methodology section of the paper, the authors developed a fast a
 
 ## Analysis
 
+The advantage of probabilistic models, like the one proposed, is their ability to quantify the inherent uncertainty in the merging process. After estimating the model parameters, match probabilities for each pair of records can be computed using Bayes' rule. This allows researchers to calculate match probabilities for each pair and account for uncertainty in downstream analysis. Researchers can set a threshold probability to determine whether pairs are matched, with trade-offs in terms of false positives and negatives. Probabilistic models allow for the estimation of false discovery rates (FDR) and false negative rates (FNR), giving insight into the quality of the matches and enabling post-merge analyses that consider uncertainty​(linkage).
+
 Uncertainty Analysis
+
+The methodology is designed to handle large-scale datasets. The authors developed a fast, scalable algorithm that incorporates blocking and parallelization techniques to manage millions of observations. The implementation of this methodology, in the form of the R package fastLink, demonstrates significant computational efficiency. Compared to other existing open-source packages, fastLink performs faster, scales better, and can process datasets with millions of records, such as voter files and political contribution databases​(linkage). This makes it feasible for social scientists to perform record linkage in large administrative datasets without sacrificing performance or accuracy
 
 Scalability
 
+The authors validate their methodology through two empirical applications. The first merges election survey data from the Cooperative Congressional Election Study (CCES) with political contribution data (DIME). This merge involves over 50,000 survey responses and more than five million donor records, where the key challenge is the small expected number of matches. The second application merges two nationwide voter files, each containing over 160 million records. These applications demonstrate the scalability of the method and its ability to handle complex data merges involving millions of records. The authors also show that incorporating auxiliary data, such as migration rates, further improves matching quality
+
 Empirical Validation
+
+The authors validate their proposed methodology through two empirical applications:
+
+1. Merging Election Survey Data with Political Contribution Data: 
+
+The first validation involved merging the 2012 Cooperative Congressional Election Study (CCES) survey data with the Database on Ideology, Money in Politics, and Elections (DIME). The dataset consisted of over 54,000 CCES respondents and more than five million donor records from DIME. The challenge was the relatively small expected number of matches between these two datasets, as not all survey respondents were expected to have made political donations. The authors utilized blocking and probabilistic record linkage to complete the merge, and the results were compared to a proprietary method previously used by other researchers. They found that fastLink performed at least as well as the proprietary method and provided a more rigorous approach by incorporating post-merge uncertainty analysis​
+
+2. Merging Two Nationwide Voter Files Over Time: 
+
+The second application involved merging two nationwide voter files, each containing over 160 million records, from 2014 and 2015. This is possibly the largest data merge ever conducted in social sciences. The key challenge in this case was dealing with voters who changed residences, making address information unreliable for matching. The authors incorporated migration rates using auxiliary data from the IRS to improve matching accuracy. Their two-step procedure combined blocking, parallelization, and probabilistic record linkage. The results showed high match rates and low false discovery rates (FDR) and false negative rates (FNR), demonstrating the efficiency and scalability of the methodology​
 
 ## Package Realization
 
