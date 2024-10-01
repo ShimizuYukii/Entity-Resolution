@@ -8,22 +8,34 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Methodology
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Literature: https://imai.fas.harvard.edu/research/files/linkage.pdf
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+To conclude the methodology section of the paper, the authors developed a fast and scalable probabilistic model designed to merge large-scale administrative records more effectively than traditional deterministic methods. This model, called fastLink, addresses issues such as missing data, measurement error, and the uncertainty inherent in merging processes, which are common in social science research. By incorporating auxiliary information, such as name frequency or migration rates, and allowing for robust simulation studies, the proposed methodology significantly outperforms deterministic approaches. Furthermore, it offers an open-source solution to merge data sets efficiently while providing tools for post-merge analyses that account for the uncertainty of the matching process​
 
-```{r cars}
-summary(cars)
+## Analysis
+
+Uncertainty Analysis
+
+Scalability
+
+Empirical Validation
+
+## Package Realization
+
+Repository: https://github.com/kosukeimai/fastLink
+
+Example: https://imai.fas.harvard.edu/research/files/turnout.pdf
+
+## Implementation 
+
+Dataset: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/2NNA4L
+
+```{r}
+suppressMessages(require("fastLink"))
+suppressMessages(require("plyr"))
+data <- read.delim("cces2016voterval.tab")
+summary(data)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
