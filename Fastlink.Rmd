@@ -38,15 +38,58 @@ The first validation involved merging the 2012 Cooperative Congressional Electio
 
 The second application involved merging two nationwide voter files, each containing over 160 million records, from 2014 and 2015. This is possibly the largest data merge ever conducted in social sciences. The key challenge in this case was dealing with voters who changed residences, making address information unreliable for matching. The authors incorporated migration rates using auxiliary data from the IRS to improve matching accuracy. Their two-step procedure combined blocking, parallelization, and probabilistic record linkage. The results showed high match rates and low false discovery rates (FDR) and false negative rates (FNR), demonstrating the efficiency and scalability of the methodology​
 
-## Package Realization
+## Model Framework and Structures
+
+### Setup
+The method involves merging two datasets, \( A \) and \( B \), each containing \( NA \) and \( NB \) records respectively. They use \( K \) linkage variables for comparisons. The model defines an agreement vector \( g(i, j) \) for each record pair \( (i, j) \), where \( g_k(i, j) \) defines the similarity of the k-th variable between records \( i \) from \( A \) and \( j \) from \( B \).
+
+### Model Formulation
+- **Linkage Variables**: Uses Bernoulli random variables \( M_{ij} \) that identify whether a record pair \( (i, j) \) matches (\( M_{ij} = 1 \)) or not (\( M_{ij} = 0 \)). In other words, The model uses simple yes/no variables, represented mathematically as Bernoulli random variables \( M_{ij} \). These variables help decide whether a pair of records \( (i, j) \) from two different datasets is a match (\( M_{ij} = 1 \)) or not (\( M_{ij} = 0 \)). Think of it as a sophisticated way of saying “these two records are talking about the same thing/person.”
+- **Conditional Distributions**: Assumes conditional independence among linkage variables given the match status \( M_{ij} \). In other words, each variable's match status (like name, address) does not depend on each other after knowing whether the overall records match. This could enable the decomposition of the joint probability distribution into simpler, individual probabilities.
+- **Handling Missing Data**: Utilizes a Missing At Random (MAR) framework to allow the omission of missing data in the probability calculations, which simplifies the likelihood function and enhances computational efficiency.
+
+## Algorithm and Computation
+
+### EM Algorithm
+The parameter estimation is executed using the Expectation-Maximization (EM) algorithm. It starts with an initial guess, then repeatedly adjusts this guess aiming to improve the likelihood that the observed data came from the proposed model. This optimizes the observed-data likelihood function, which integrates over the probabilistic distributions of the linkage variables conditioned on the match hypotheses.
+
+### Blocking and Filtering
+To reduce computational demands:
+- **Blocking**: To avoid comparing every record in one dataset with every record in another, which can be overwhelmingly time-consuming with large datasets, the model groups records into blocks based on shared characteristics (like all people with the same birth year), which greatly cuts down on unnecessary comparisons.
+- **Filtering**: Eliminates highly unlikely pairs from consideration early in the process, using thresholds based on calculated probabilities.
+
+### Scalability
+The algorithm is designed to work efficiently even with very large datasets that contain millions of records. It uses parallel processing (splitting the work across multiple computer processors) and smart data structures to manage this, making it practical to run on a typical laptop without needing supercomputer resources.
+
+## Evaluation and Implementation
+
+### Simulation Studies
+The model's robustness is tested through simulations that mimic real-world problems like incomplete data or errors in the data (measurement errors). These simulations help verify that the model can handle different types of common data issues effectively. The model is compared to traditional methods (like exact match), showing that it can handle complex, imperfect data more effectively and efficiently.
+
+### Package Realization
 
 Repository: https://github.com/kosukeimai/fastLink
 
 Example: https://imai.fas.harvard.edu/research/files/turnout.pdf
 
-## Implementation 
+### Implementation 
 
 Dataset: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/2NNA4L
+
+## Statistical Analysis Post-Merging
+
+### Uncertainty Quantification
+The model quantifies the uncertainty in the merging process, allowing researchers to account for potential errors in subsequent analyses, which is critical for maintaining the integrity of research conclusions.
+
+### Post-Merge Analysis
+Discusses methodologies for incorporating the probabilities of matches into regression analyses and other statistical procedures to adjust for the uncertainty inherent in the linkage process.
+
+## Contributions and Innovations
+
+The model makes substantial contributions to the field of data management by providing:
+- A robust probabilistic framework that substantially outperforms traditional deterministic methods. Unlike older methods that just said 'yes' or 'no' to whether records match, this model calculates how likely it is that records match. This approach gives us a clearer picture and usually results in better performance.
+- Enhanced handling of missing data and the independence assumptions of linkage variables, which have been a significant limitation in earlier models.
+- Detailed documentation and an accessible implementation in R, which facilitates reproducible research and widespread adoption in the social sciences.
 
 ```{r}
 suppressMessages(require("fastLink"))
