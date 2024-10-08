@@ -14,6 +14,49 @@ Literature: https://imai.fas.harvard.edu/research/files/linkage.pdf
 
 To conclude the methodology section of the paper, the authors developed a fast and scalable probabilistic model designed to merge large-scale administrative records more effectively than traditional deterministic methods. This model, called fastLink, addresses issues such as missing data, measurement error, and the uncertainty inherent in merging processes, which are common in social science research. By incorporating auxiliary information, such as name frequency or migration rates, and allowing for robust simulation studies, the proposed methodology significantly outperforms deterministic approaches. Furthermore, it offers an open-source solution to merge data sets efficiently while providing tools for post-merge analyses that account for the uncertainty of the matching process​
 
+
+Notate $\gamma(i,j)$ to be the distance between a pair, $\delta(i,j)$ to the missing indicator, $M_{ij}$ to be a matrix storing pairing imformation, which is latent, then generally, we are estimating
+
+$$
+\operatorname{Pr}\left(M_{i j}=1 \mid \delta(i, j), \gamma(i, j)\right)
+$$
+
+Then we may merge by thretholding. To achieve this, we make two assumptions for the latent mixing variable $M$
+
+$$
+\begin{aligned}
+& \gamma_k(i, j) \mid M_{i j}= m \stackrel{\text { indep. }}{\sim} \operatorname{Discrete}\left(\pi_{k m}\right); \\
+& M_{i j} \stackrel{\text { i.i.d. }}{\sim} \operatorname{Bernoulli}(\lambda)
+\end{aligned}
+$$
+
+then we can obtain that
+
+$$
+\begin{aligned}
+\xi_{i j} & =\operatorname{Pr}\left(M_{i j}=1 \mid \boldsymbol{\delta}(i, j), \gamma(i, j)\right) \\
+& =\frac{\lambda \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k \ell \ell}^{1\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}{\sum_{m=0}^1 \lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{1\left\{\gamma_{\ell}(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}
+\end{aligned}
+$$
+
+Intuitively, we plug in the maximum likelihood estimation of $\lambda$ and $\pi$ here, which is
+
+$$
+\mathcal{L}_{c o m}(\lambda, \boldsymbol{\pi} \mid \boldsymbol{\gamma}, \boldsymbol{\delta}) \propto \prod_{i=1}^{N_{\mathcal{A}}} \prod_{j=1}^{N_{\mathcal{B}}} \prod_{m=0}^1\left\{\lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{\mathbf{1}\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}\right\}^{\mathbf{1}\left\{M_{i j}=m\right\}}
+$$
+
+which is hard to compute, so iteratively, we apply EM method with 
+
+$$
+\begin{aligned}
+\lambda & =\frac{1}{N_{\mathcal{A}} N_{\mathcal{B}}} \sum_{i=1}^{N_{\mathcal{A}}} \sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j} \\
+\pi_{k m \ell} & =\frac{\left.\sum_{i=1}^{N_{\mathcal{A}}} \sum_{j=1}^{N_{\mathcal{B}}} \mathbf{1}\left\{\gamma_k(i, j)=l\right)\right\}\left(1-\delta_k(i, j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}{\sum_{i=1}^{N_{\mathcal{A}}} \sum_{j=1}^{N_{\mathcal{B}}}\left(1-\delta_k(i, j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}
+\end{aligned}
+$$
+
+
+together with the $\xi_{ij}$ above
+
 ## Model Framework and Structures
 
 ### Setup
