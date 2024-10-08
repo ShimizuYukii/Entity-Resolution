@@ -1,7 +1,9 @@
 ---
 title: "Fastlink"
 author: "Haocheng Qin, Kewei Xu, Zaolin Zhang, Chuhan Guo"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -42,15 +44,15 @@ $$
 Intuitively, we plug in the maximum likelihood estimation of $\lambda$ and $\pi$ here, which is
 
 $$
-\mathcal{L}_{c o m}(\lambda, \boldsymbol{\pi} \mid \boldsymbol{\gamma}, \boldsymbol{\delta}) \propto \prod_{i=1}^{N_{\mathcal{A}}} \prod_{j=1}^{N_{\mathcal{B}}} \prod_{m=0}^1\left\{\lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{\mathbf{1}\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}\right\}^{\mathbf{1}\left\{M_{i j}=m\right\}}
+L_{c o m}(\lambda, \boldsymbol{\pi} \mid \boldsymbol{\gamma}, \boldsymbol{\delta}) \propto \prod_{i=1}^{N_{A}} \prod_{j=1}^{N_{B}} \prod_{m=0}^1\left\{\lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{\mathbf{1}\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}\right\}^{\mathbf{1}\left\{M_{i j}=m\right\}}
 $$
 
 which is hard to compute, so iteratively, we apply EM method with 
 
 $$
 \begin{aligned}
-\lambda & =\frac{1}{N_{\mathcal{A}} N_{\mathcal{B}}} \sum_{i=1}^{N_{\mathcal{A}}} \sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j} \\
-\pi_{k m \ell} & =\frac{\left.\sum_{i=1}^{N_{\mathcal{A}}} \sum_{j=1}^{N_{\mathcal{B}}} \mathbf{1}\left\{\gamma_k(i, j)=l\right)\right\}\left(1-\delta_k(i, j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}{\sum_{i=1}^{N_{\mathcal{A}}} \sum_{j=1}^{N_{\mathcal{B}}}\left(1-\delta_k(i, j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}
+\lambda & =\frac{1}{N_{A} N_{B}} \sum_{i=1}^{N_{A}} \sum_{j=1}^{N_{B}} \xi_{i j} \\
+\pi_{k m \ell} & =\frac{\left.\sum_{i=1}^{N_{A}} \sum_{j=1}^{N_{B}} \mathbf{1}\left\{\gamma_k(i, j)=l\right)\right\}\left(1-\delta_k(i, j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}{\sum_{i=1}^{N_{A}} \sum_{j=1}^{N_{B}}\left(1-\delta_k(i, j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}
 \end{aligned}
 $$
 
