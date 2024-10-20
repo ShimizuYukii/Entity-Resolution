@@ -1,0 +1,78 @@
+---
+title: "Demo"
+author:  "Haocheng, Kewei, Zaolin, Chuhan"
+output:
+  beamer_presentation:
+    theme: "AnnArbor"
+    colortheme: "seahorse"
+    fonttheme: "structurebold"
+bibliography: references.bib
+link-citations: true
+csl: ieee.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Introduction
+
++ blabla
++ blabla
+  - blabla
+
+## Methodology
+
+- General settings
+$$
+\begin{aligned}
+&\text{Latent Matches } && M_{i j} \stackrel{\text { i.i.d. }}{\sim} \operatorname{Bernoulli}(\lambda)\\
+&\text{Distance } && \gamma_k(i, j) \mid M_{i j}= m \stackrel{\text { indep. }}{\sim} \operatorname{Discrete}\left(\pi_{k m}\right) \\
+&\text{Missing Indicator } &&\delta_k(i, j) \perp \gamma_k(i, j) \mid M_{i j}\\
+&\text{Probability }&&\xi_{i j} :=\operatorname{Pr}\left(M_{i j}=1 \mid \delta(i, j), \gamma(i, j)\right)
+\end{aligned}
+$$
++ Quite similar to Fellegi-Sunter[@fellegi1969]
++ Capable pf dealing MAP missings
+
+## Methodology
+
++ Probabilistic model, see getPosterior.R
+$$
+\begin{aligned}
+\xi_{i j}  =\frac{\lambda \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k \ell \ell}^{1\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}{\sum_{m=0}^1 \lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{1\left\{\gamma_{\ell}(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}
+\end{aligned}
+$$
++ Nice for evaluation and post-merge analysis
+$$
+X^*_i=\sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j} X_j / \sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j}
+$$
+
+## Methodology
+
++ Nice for calculation
+  - Likelihood and boosting with EM steps[@winkler2000]
+$$
+\begin{aligned}
+\lambda & =\frac{1}{N_{A} N_{B}} \sum_{i=1}^{N_{A}} \sum_{j=1}^{N_{B}} \xi_{i j} \\
+\pi_{k m \ell} & =\frac{\left.\sum_{i=1}^{N_{A}} \sum_{j=1}^{N_{B}} \mathbf{1}\left\{\gamma_k(i, j)=l\right)\right\}\left(1-\delta_k(i, j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}{\sum_{i=1}^{N_{A}} \sum_{j=1}^{N_{B}}\left(1-\delta_k(i, j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}
+\end{aligned}
+$$
+  - logemlink.R and emlinkMARmov.R
+
+## Methodology
+
+
+## Dataset
+
+## Package Implement
+
+```{r}
+print(123)
+```
+
+
+## References
+
+<div id="refs"></div>
