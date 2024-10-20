@@ -18,9 +18,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-+ blabla
-+ blabla
-  - blabla
++ FastLink is a scalable entity resolution methodology designed for merging large-scale datasets.
++ Advantages
+  - Addresses challenges such as missing data, measurement errors, and uncertainty in the merging process
+  - Provide more flexibility by using auxiliary information (e.g., name frequency, migration rates)
+  - Utilize a probabilistic match score for more accurate linking, even with incomplete or imprecise data
+  - Scalable and capable of handling millions of records, making it efficient in terms of speed and accuracy
++ Limitations
+  - Less effective with long strings (e.g., full names, long addresses) due to variations and typographical errors without advanced string-matching algorithms
 
 ## Methodology
 
