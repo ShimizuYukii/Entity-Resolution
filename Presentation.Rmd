@@ -2,11 +2,11 @@
 title: "Demo"
 author: "Haocheng, Kewei, Zaolin, Chuhan"
 output:
+  slidy_presentation: default
   beamer_presentation:
     theme: AnnArbor
     colortheme: seahorse
     fonttheme: structurebold
-  slidy_presentation: default
   ioslides_presentation: default
 bibliography: references.bib
 link-citations: yes
@@ -113,16 +113,6 @@ matches.out <- fastLink(
 )
 ```
 
-dfA and dfB are 2 dataframes we want to merge together. 
-
-varnames: a vector of variable names used for matching and must exist in both dfA and dfB.
-
-stringdist.match: a subset of varnames for which agreement is calculated using Jaro-Winkler distance.
-
-partial.match: a subset of stringdist.match that includes variables for which partial agreement is also calculated based on Jaro-Winkler distance.
-
-## Package Implement
-
 The merged dataset can be accessed using the getMatches() function:
 
 ```{r, eval=FALSE}
@@ -134,29 +124,15 @@ matched_dfs <- getMatches(
 
 ## Package Implement
 
-Other functions of Package "FastLink":
+- Preprocessing Matches via Blocking: The blockData() function can block two datasets using one or more variables and various blocking techniques.
 
-- Preprocessing Matches via Blocking
+- Using Auxiliary Information to Inform fastLink: The algorithm could also incorporate auxiliary information on migration behavior to inform the matching of datasets over time.
 
-Researchers often block similar observations from datasets A and B to minimize pairwise comparisons, restricting comparisons to highly similar groups. The blockData() function can block two datasets using one or more variables and various blocking techniques.
+- Aggregating Multiple Matches Together: The algorithm can also aggregate multiple matches into a single summary using the aggregateEM() function.
 
-- Using Auxiliary Information to Inform fastLink
+- Random Sampling with fastLink: The algorithm allows us to run the matching algorithm on a randomly selected smaller subset of data to be matched and then apply those estimates to the full sample of data.
 
-The fastLink algorithm also includes several ways to incorporate auxiliary information on migration behavior to inform the matching of datasets over time.
-
-- Aggregating Multiple Matches Together
-
-The algorithm can also aggregate multiple matches into a single summary using the aggregateEM() function.
-
-## Package Implement
-
-- Random Sampling with fastLink
-
-The algorithm allows us to run the matching algorithm on a randomly selected smaller subset of data to be matched and then apply those estimates to the full sample of data.
-
-- Finding Duplicates within a Dataset via fastLink
-
-The algorithm uses the probabilistic match algorithm to identify duplicated entries.
+- Finding Duplicates within a Dataset via fastLink: The algorithm uses the probabilistic match algorithm to identify duplicated entries.
 
 ## References
 
