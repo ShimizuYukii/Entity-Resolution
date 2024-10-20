@@ -74,8 +74,6 @@ $$
 
 
 
-## Dataset
-
 ## Package Implement
 
 The required package for FastLink is called "fastLink":
@@ -133,6 +131,13 @@ matched_dfs <- getMatches(
 - Random Sampling with fastLink: The algorithm allows us to run the matching algorithm on a randomly selected smaller subset of data to be matched and then apply those estimates to the full sample of data.
 
 - Finding Duplicates within a Dataset via fastLink: The algorithm uses the probabilistic match algorithm to identify duplicated entries.
+
+## Dataset
+
++ Two sets of datasets explored
+  - Products on Amazon & Google
+  - fictious dataset from Freely Extensible Biomedical Record Linkage
++ Empirical evidence of reduced effectiveness with long strings (e.g., product descriptions)
 
 ## References
 
