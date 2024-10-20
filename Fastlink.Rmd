@@ -2,8 +2,8 @@
 title: "Fastlink"
 author: "Haocheng Qin, Kewei Xu, Zaolin Zhang, Chuhan Guo"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 bibliography: references.bib
 link-citations: true
 csl: ieee.csl
@@ -12,6 +12,8 @@ csl: ieee.csl
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+## Introduction
 
 ## Methodology
 
@@ -115,7 +117,7 @@ The model makes substantial contributions to the field of data management by pro
 - Enhanced handling of missing data and the independence assumptions of linkage variables, which have been a significant limitation in earlier models.
 - Detailed documentation and an accessible implementation in R, which facilitates reproducible research and widespread adoption in the social sciences.
 
-```{r}
+```{r,warning=FALSE}
 suppressMessages(require("fastLink"))
 suppressMessages(require("plyr"))
 data <- read.delim("cces2016voterval.tab")
