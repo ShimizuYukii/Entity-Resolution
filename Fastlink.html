@@ -252,6 +252,28 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
 
 
 
@@ -357,29 +379,20 @@ display: none;
 
 <div id="methodology" class="section level2">
 <h2>Methodology</h2>
-<p>Literature: <a href="https://imai.fas.harvard.edu/research/files/linkage.pdf" class="uri">https://imai.fas.harvard.edu/research/files/linkage.pdf</a></p>
-<p>To conclude the methodology section of the paper, the authors
-developed a fast and scalable probabilistic model designed to merge
-large-scale administrative records more effectively than traditional
-deterministic methods. This model, called fastLink, addresses issues
-such as missing data, measurement error, and the uncertainty inherent in
-merging processes, which are common in social science research. By
-incorporating auxiliary information, such as name frequency or migration
-rates, and allowing for robust simulation studies, the proposed
-methodology significantly outperforms deterministic approaches.
-Furthermore, it offers an open-source solution to merge data sets
-efficiently while providing tools for post-merge analyses that account
-for the uncertainty of the matching process​</p>
-<p>Notate <span class="math inline">\(\gamma(i,j)\)</span> to be the
-distance between a pair, <span class="math inline">\(\delta(i,j)\)</span> to the missing indicator,
-<span class="math inline">\(M_{ij}\)</span> to be a matrix storing
-pairing imformation, which is latent, then generally, we are
-estimating</p>
-<p><span class="math display">\[
-\operatorname{Pr}\left(M_{i j}=1 \mid \delta(i, j), \gamma(i, j)\right)
-\]</span></p>
-<p>Then we may merge by thretholding. To achieve this, we make two
-assumptions for the latent mixing variable <span class="math inline">\(M\)</span></p>
+<p>Let’s first describe the canonical probabilistic model of record
+linkage to demonstrate its properties. Materials are from the</p>
+<p>original papaer: <a href="https://imai.fas.harvard.edu/research/files/linkage-app.pdf" class="uri">https://imai.fas.harvard.edu/research/files/linkage-app.pdf</a></p>
+<p>and its online supplementary: <a href="https://imai.fas.harvard.edu/research/files/linkage-app.pdf" class="uri">https://imai.fas.harvard.edu/research/files/linkage-app.pdf</a></p>
+<p>Let a latent mixing variable <span class="math inline">\(M_{ij}\)</span> to indicate whether a pair of
+records (for the ith record in the data set A and the jth record in the
+data set B). Notate <span class="math inline">\(\gamma(i,j)\)</span> to
+be the distance between a pair, just as Fellegi and Sunter did<span class="citation"><a href="#ref-fellegi1969">[1]</a></span>, it’s
+changebable but we just use Jaro-Winkler string distance here, which is
+commonly used<span class="citation"><a href="#ref-jaro1989">[2]</a></span>; and <span class="math inline">\(\delta(i,j)\)</span> to the missing indicator, to
+deal with missing data, then generally, we are estimating <span class="math inline">\(\xi_{i j} :=\operatorname{Pr}\left(M_{i j}=1 \mid
+\delta(i, j), \gamma(i, j)\right)\)</span>. We can notice that,
+actually, without the missing indicator, Fastlink would be quite similar
+to Fellegi-Sunter. Even the assumptions are the same:</p>
 <p><span class="math display">\[
 \begin{aligned}
 &amp; \gamma_k(i, j) \mid M_{i j}= m \stackrel{\text { indep. }}{\sim}
@@ -388,20 +401,34 @@ assumptions for the latent mixing variable <span class="math inline">\(M\)</span
 \operatorname{Bernoulli}(\lambda)
 \end{aligned}
 \]</span></p>
-<p>then we can obtain that</p>
+<p>But this can be actually relaxed, we will discuss it later. So
+addressing missing data would surelly be a significant property of
+Fastlink. Theoretically, it relies on a missing at random assumption
+(i.e. <span class="math inline">\(\delta_k(i, j) \perp \gamma_k(i, j)
+\mid M_{i j}\)</span>), but it still works well under some other
+conditions. With some Bayes calculation (still similar to what
+Fellegi-Sunter did), actually we can obtain the exact probability to
+be:</p>
 <p><span class="math display">\[
 \begin{aligned}
-\xi_{i j} &amp; =\operatorname{Pr}\left(M_{i j}=1 \mid
-\boldsymbol{\delta}(i, j), \gamma(i, j)\right) \\
-&amp; =\frac{\lambda \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k
-\ell \ell}^{1\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i,
-j)}}{\sum_{m=0}^1 \lambda^m(1-\lambda)^{1-m}
-\prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m
-\ell}^{1\left\{\gamma_{\ell}(i, j)=\ell\right\}}\right)^{1-\delta_k(i,
-j)}}
+\xi_{i j}  =\frac{\lambda \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1}
+\pi_{k \ell \ell}^{1\left\{\gamma_k(i,
+j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}{\sum_{m=0}^1
+\lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1}
+\pi_{k m \ell}^{1\left\{\gamma_{\ell}(i,
+j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}
 \end{aligned}
 \]</span></p>
-<p>Intuitively, we plug in the maximum likelihood estimation of <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(\pi\)</span> here, which is</p>
+<p>For the package, this is done by getPosterior(). This introduces us
+two main advantages:</p>
+<p>Firstly, probabilistic models can quantify the uncertainty inherent
+in many merge procedures, offering a principled way to calibrate and
+account for false positives and false negatives. Also for post-merge
+analysis, such probability works as a good weight for merged variable,
+i.e. <span class="math inline">\(X^*_i=\sum_{j=1}^{N_{\mathcal{B}}}
+\xi_{i j} X_j / \sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j}\)</span></p>
+<p>Secondly, this proviade an easy way to compute. Intuitively, we can
+plug in the maximum likelihood estimation of <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(\pi\)</span> here, which is</p>
 <p><span class="math display">\[
 L_{c o m}(\lambda, \boldsymbol{\pi} \mid \boldsymbol{\gamma},
 \boldsymbol{\delta}) \propto \prod_{i=1}^{N_{A}} \prod_{j=1}^{N_{B}}
@@ -411,8 +438,8 @@ L_{c o m}(\lambda, \boldsymbol{\pi} \mid \boldsymbol{\gamma},
 j)=\ell\right\}}\right)^{1-\delta_k(i,
 j)}\right\}^{\mathbf{1}\left\{M_{i j}=m\right\}}
 \]</span></p>
-<p>which is hard to compute, so iteratively, we apply EM method with</p>
-<p><span class="math display">\[
+<p>which is hard to compute, but iteratively, we can apply EM
+(Expectation-Maximization) method<span class="citation"><a href="#ref-winkler2000">[3]</a></span> with <span class="math display">\[
 \begin{aligned}
 \lambda &amp; =\frac{1}{N_{A} N_{B}} \sum_{i=1}^{N_{A}}
 \sum_{j=1}^{N_{B}} \xi_{i j} \\
@@ -423,8 +450,17 @@ j)\right) \xi_{i j}^m\left(1-\xi_{i j}\right)^{1-m}}{\sum_{i=1}^{N_{A}}
 j}^m\left(1-\xi_{i j}\right)^{1-m}}
 \end{aligned}
 \]</span></p>
-<p>together with the <span class="math inline">\(\xi_{ij}\)</span>
-above</p>
+<p>together with the calculated <span class="math inline">\(\xi_{ij}\)</span> above. You can find the codes
+for EM calculations in “emlinkMARmov.R”, by codes you can find this
+package actually allows a prior for the hyperparameters, which is not
+shown above.</p>
+<p>Actually we can find another function called “emlinklog.R” in the
+package, this is actually accommodating a more general pattern of
+interaction. This algorithm allows for the inclusion of interaction
+terms, that is what I said the assumptions can be relaxed, but without a
+prior, you can choose it by state “cond.indep = False” in the main
+function fastlink() according to your requirements, but we will not go
+through the details of this algorithm here.</p>
 </div>
 <div id="model-framework-and-structures" class="section level2">
 <h2>Model Framework and Structures</h2>
@@ -543,8 +579,9 @@ linkage variables, which have been a significant limitation in earlier
 models. - Detailed documentation and an accessible implementation in R,
 which facilitates reproducible research and widespread adoption in the
 social sciences.</p>
-<pre class="r"><code>suppressMessages(require(&quot;fastLink&quot;))
-suppressMessages(require(&quot;plyr&quot;))
+<pre class="r"><code>suppressMessages(require(&quot;fastLink&quot;))</code></pre>
+<pre><code>## Warning: 程辑包&#39;fastLink&#39;是用R版本4.3.3 来建造的</code></pre>
+<pre class="r"><code>suppressMessages(require(&quot;plyr&quot;))
 data &lt;- read.delim(&quot;cces2016voterval.tab&quot;)
 summary(data)</code></pre>
 <pre><code>##       V101             merge_type    agreement_pattern    prob_match       
@@ -575,6 +612,30 @@ summary(data)</code></pre>
 ##  Mean   :0.3872    Mean   :0.4441   
 ##  3rd Qu.:1.0000    3rd Qu.:1.0000   
 ##  Max.   :1.0000    Max.   :1.0000</code></pre>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<div id="refs" class="references csl-bib-body">
+<div id="ref-fellegi1969" class="csl-entry">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">I.
+P. Fellegi and A. B. Sunter, <span>“A theory for record linkage,”</span>
+<em>Journal of the American Statistical Association</em>, vol. 64, no.
+328, pp. 1183–1210, 1969.</div>
+</div>
+<div id="ref-jaro1989" class="csl-entry">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">M.
+A. Jaro, <span>“Advances in record-linkage methodology as applied to
+matching the 1985 census of tampa, florida,”</span> <em>Journal of the
+American Statistical Association</em>, vol. 84, no. 406, pp. 414–420,
+1989.</div>
+</div>
+<div id="ref-winkler2000" class="csl-entry">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">W.
+E. Winkler, <em>Using the EM algorithm for weight computation in the
+fellegi-sunter model of record linkage</em>. US Bureau of the Census
+Washington, DC, 2000.</div>
+</div>
+</div>
 </div>
 
 

@@ -2,8 +2,11 @@
 title: "Fastlink"
 author: "Haocheng Qin, Kewei Xu, Zaolin Zhang, Chuhan Guo"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
+bibliography: references.bib
+link-citations: true
+csl: ieee.csl
 ---
 
 ```{r setup, include=FALSE}
@@ -12,18 +15,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Methodology
 
-Literature: https://imai.fas.harvard.edu/research/files/linkage.pdf
+Let's first describe the canonical probabilistic model of record linkage to demonstrate its properties. Materials are from the 
 
-To conclude the methodology section of the paper, the authors developed a fast and scalable probabilistic model designed to merge large-scale administrative records more effectively than traditional deterministic methods. This model, called fastLink, addresses issues such as missing data, measurement error, and the uncertainty inherent in merging processes, which are common in social science research. By incorporating auxiliary information, such as name frequency or migration rates, and allowing for robust simulation studies, the proposed methodology significantly outperforms deterministic approaches. Furthermore, it offers an open-source solution to merge data sets efficiently while providing tools for post-merge analyses that account for the uncertainty of the matching process​
+original papaer: https://imai.fas.harvard.edu/research/files/linkage-app.pdf 
 
+and its online supplementary: https://imai.fas.harvard.edu/research/files/linkage-app.pdf
 
-Notate $\gamma(i,j)$ to be the distance between a pair, $\delta(i,j)$ to the missing indicator, $M_{ij}$ to be a matrix storing pairing imformation, which is latent, then generally, we are estimating
-
-$$
-\operatorname{Pr}\left(M_{i j}=1 \mid \delta(i, j), \gamma(i, j)\right)
-$$
-
-Then we may merge by thretholding. To achieve this, we make two assumptions for the latent mixing variable $M$
+Let a latent mixing variable $M_{ij}$ to indicate whether a pair of
+records (for the ith record in the data set A and the jth
+record in the data set B). Notate $\gamma(i,j)$ to be the distance between a pair, just as Fellegi and Sunter did[@fellegi1969], it's changebable but we just use Jaro-Winkler string distance here, which is commonly used[@jaro1989]; and $\delta(i,j)$ to the missing indicator, to deal with missing data, then generally, we are estimating $\xi_{i j} :=\operatorname{Pr}\left(M_{i j}=1 \mid \delta(i, j), \gamma(i, j)\right)$. We can notice that, actually, without the missing indicator, Fastlink would be quite similar to Fellegi-Sunter. Even the assumptions are the same:
 
 $$
 \begin{aligned}
@@ -32,23 +32,25 @@ $$
 \end{aligned}
 $$
 
-then we can obtain that
+But this can be actually relaxed, we will discuss it later. So addressing missing data would surelly be a significant property of Fastlink. Theoretically, it relies on a missing at random assumption (i.e. $\delta_k(i, j) \perp \gamma_k(i, j) \mid M_{i j}$), but it still works well under some other conditions. With some Bayes calculation (still similar to what Fellegi-Sunter did), actually we can obtain the exact probability to be:
 
 $$
 \begin{aligned}
-\xi_{i j} & =\operatorname{Pr}\left(M_{i j}=1 \mid \boldsymbol{\delta}(i, j), \gamma(i, j)\right) \\
-& =\frac{\lambda \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k \ell \ell}^{1\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}{\sum_{m=0}^1 \lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{1\left\{\gamma_{\ell}(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}
+\xi_{i j}  =\frac{\lambda \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k \ell \ell}^{1\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}{\sum_{m=0}^1 \lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{1\left\{\gamma_{\ell}(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}
 \end{aligned}
 $$
 
-Intuitively, we plug in the maximum likelihood estimation of $\lambda$ and $\pi$ here, which is
+For the package, this is done by getPosterior(). This introduces us two main advantages: 
+
+Firstly, probabilistic models can quantify the uncertainty inherent in many merge procedures, offering a principled way to calibrate and account for false positives and false negatives. Also for post-merge analysis, such probability works as a good weight for merged variable, i.e. $X^*_i=\sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j} X_j / \sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j}$
+
+Secondly, this proviade an easy way to compute. Intuitively, we can plug in the maximum likelihood estimation of $\lambda$ and $\pi$ here, which is
 
 $$
 L_{c o m}(\lambda, \boldsymbol{\pi} \mid \boldsymbol{\gamma}, \boldsymbol{\delta}) \propto \prod_{i=1}^{N_{A}} \prod_{j=1}^{N_{B}} \prod_{m=0}^1\left\{\lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{\mathbf{1}\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}\right\}^{\mathbf{1}\left\{M_{i j}=m\right\}}
 $$
 
-which is hard to compute, so iteratively, we apply EM method with 
-
+which is hard to compute, but iteratively, we can apply EM (Expectation-Maximization) method[@winkler2000] with 
 $$
 \begin{aligned}
 \lambda & =\frac{1}{N_{A} N_{B}} \sum_{i=1}^{N_{A}} \sum_{j=1}^{N_{B}} \xi_{i j} \\
@@ -56,8 +58,9 @@ $$
 \end{aligned}
 $$
 
+together with the calculated $\xi_{ij}$ above. You can find the codes for EM calculations in "emlinkMARmov.R", by codes you can find this package actually allows a prior for the hyperparameters, which is not shown above. 
 
-together with the $\xi_{ij}$ above
+Actually we can find another function called "emlinklog.R" in the package, this is actually accommodating a more general pattern of interaction. This algorithm allows for the inclusion of interaction terms, that is what I said the assumptions can be relaxed, but without a prior, you can choose it by state "cond.indep = False" in the main function fastlink() according to your requirements, but we will not go through the details of this algorithm here.
 
 ## Model Framework and Structures
 
@@ -119,3 +122,6 @@ data <- read.delim("cces2016voterval.tab")
 summary(data)
 ```
 
+## References
+
+<div id="refs"></div>
