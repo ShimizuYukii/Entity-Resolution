@@ -138,6 +138,9 @@ matched_dfs <- getMatches(
   - Products on Amazon & Google
   - fictious dataset from Freely Extensible Biomedical Record Linkage
 + Empirical evidence of reduced effectiveness with long strings (e.g., product descriptions)
+  - only 75 matches for Amazon (>1000 rows) & Google (>3000 rows) product datasets
++ Avoid overly broad matching criteria / using too many variables
+  - Inflate match rate (even over 100%), underestimate False Discovery Rate (FDR) and False Non-match Rate (FNR)
 
 ## References
 
