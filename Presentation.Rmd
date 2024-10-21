@@ -146,6 +146,13 @@ matched_dfs <- getMatches(
 
 ## Dataset
 
++ choose more informative variable could reduce the use of matching variables
+  - name + soc_sec_id vs name + address + suburb
++ number of matches & jaccard index vs threshold probabilities
+  - jaccard index = intersection size / union size
+
+
+
 
 
 ## References
