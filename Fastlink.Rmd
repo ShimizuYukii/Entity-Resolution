@@ -15,6 +15,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
+FastLink is a entity resolution methodology designed to merge large-scale datasets efficiently, addressing challenges such as missing data, measurement errors, and
+uncertainty in the merging process. Compared to traditional deterministic techniques, which rely on exact matching criteria, FastLink offers more flexibility by leveraging 
+auxiliary information (e.g., name frequency, migration rates) and providing a probabilistic match score. This allows for more accurate linking of records even when data is 
+incomplete or imprecise. Its scalability makes it suitable for handling millions of records, outperforming many existing methods in both speed and accuracy. However, 
+FastLink has limitations when dealing with long strings, such as full names or addresses, where variations and typographical errors can reduce its effectiveness, especially
+without robust string-matching algorithms to support such cases.
+
 ## Methodology
 
 Let's first describe the canonical probabilistic model of record linkage to demonstrate its properties. Materials are from the 
