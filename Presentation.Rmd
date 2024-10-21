@@ -2,7 +2,8 @@
 title: "Demo"
 author: "Haocheng, Kewei, Zaolin, Chuhan"
 output:
-  powerpoint_presentation: default
+  powerpoint_presentation:
+    reference_doc: "reference.pptx" 
   beamer_presentation:
     theme: AnnArbor
     colortheme: seahorse
@@ -128,12 +129,19 @@ matched_dfs <- getMatches(
 + Avoid overly broad matching criteria / using too many variables
   - Inflate match rate (even over 100%), underestimate False Discovery Rate (FDR) and False Non-match Rate (FNR)
 
+("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/over_match.png")
+
 ## Dataset
 
 + choose more informative variable could reduce the use of matching variables
   - name + soc_sec_id vs name + address + suburb
 + number of matches & jaccard index vs threshold probabilities
   - jaccard index = intersection size / union size
+
+("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/address1%2Bsuburb.png")
+("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/soc_sec_id.png")
+("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/num_match%20vs%20prob.png")
+("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/jaccard%20vs%20prob.png")
 
 
 
