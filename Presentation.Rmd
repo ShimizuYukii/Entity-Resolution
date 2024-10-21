@@ -69,12 +69,6 @@ $$
 $$
   - logemlink.R and emlinkMARmov.R
 
-## Methodology
-
-
-
-
-
 ## Package Implement
 
 Install the most recent version of "fastLink" package (version 0.6):
