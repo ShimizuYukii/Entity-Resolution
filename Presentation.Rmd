@@ -153,6 +153,7 @@ matched_dfs <- getMatches(
 
 ("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/address1%2Bsuburb.png")
 ("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/soc_sec_id.png")
+("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/num_match%20vs%20prob.png")
 
 
 
