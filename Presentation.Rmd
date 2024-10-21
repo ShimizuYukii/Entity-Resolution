@@ -114,15 +114,15 @@ matched_dfs <- getMatches(
 
 ## Package Implement
 
-- Preprocessing Matches via Blocking
+- Preprocessing Matches via Blocking: The blockData() function can block two datasets using one or more variables and various blocking techniques.
 
-- Using Auxiliary Information to Inform fastLink
+- Using Auxiliary Information to Inform fastLink: The algorithm could also incorporate auxiliary information on migration behavior to inform the matching of datasets over time.
 
-- Aggregating Multiple Matches Together
+- Aggregating Multiple Matches Together: The algorithm can also aggregate multiple matches into a single summary using the aggregateEM() function.
 
-- Random Sampling with fastLink
+- Random Sampling with fastLink: The algorithm allows us to run the matching algorithm on a randomly selected smaller subset of data to be matched and then apply those estimates to the full sample of data.
 
-- Finding Duplicates within a Dataset via fastLink
+- Finding Duplicates within a Dataset via fastLink: The algorithm uses the probabilistic match algorithm to identify duplicated entries.
 
 ## Dataset
 
