@@ -2,11 +2,12 @@
 title: "Demo"
 author: "Haocheng, Kewei, Zaolin, Chuhan"
 output:
-  slidy_presentation: default
+  powerpoint_presentation: default
   beamer_presentation:
     theme: AnnArbor
     colortheme: seahorse
     fonttheme: structurebold
+  slidy_presentation: default
   ioslides_presentation: default
 bibliography: references.bib
 link-citations: yes
