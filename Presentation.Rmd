@@ -142,6 +142,8 @@ matched_dfs <- getMatches(
 + Avoid overly broad matching criteria / using too many variables
   - Inflate match rate (even over 100%), underestimate False Discovery Rate (FDR) and False Non-match Rate (FNR)
 
+(RS data/over_match.png)
+
 ## References
 
 <div id="refs"></div>
