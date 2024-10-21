@@ -105,9 +105,67 @@ Repository: https://github.com/kosukeimai/fastLink
 
 Example: https://imai.fas.harvard.edu/research/files/turnout.pdf
 
-### Implementation 
+## Package Implement
 
-Dataset: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/2NNA4L
+The required package for FastLink is called “fastLink”:
+
+```{r, eval=FALSE}
+install.packages("fastLink")
+```
+
+Install the most recent version of "fastLink" package (version 0.6):
+
+```{r, eval=FALSE}
+library(devtools)
+install_github("kosukeimai/fastLink",dependencies=TRUE)
+## Load the package and data
+library(fastLink)
+```
+
+Tutorial Link: https://github.com/kosukeimai/fastLink
+
+## Package Implement
+
+Here we want to merge data frame A and data frame B:
+
+```{r, eval=FALSE}
+matches.out <- fastLink(
+  dfA = dfA, dfB = dfB, 
+  varnames = c("given_name", "surname", "address_1", "suburb"),
+  stringdist.match = c("given_name", "surname"),
+  partial.match = c("given_name", "surname"),
+  return.all = TRUE
+)
+```
+
+varnames: a vector containing the names of variables that will be used for matching, and these variable names must be present in both dfA and dfB.
+
+stringdist.match: a vector of variable names selected from varnames. For the variables included in stringdist.match, agreement will be assessed using the Jaro-Winkler distance.
+
+partial.match: a vector containing variable names that must be part of both stringdist.match and varnames. Variables listed in partial.match will have an additional partial agreement category calculated, alongside the disagreement and full agreement categories, based on the Jaro-Winkler distance.
+
+The merged dataset can be accessed using the getMatches() function:
+
+```{r, eval=FALSE}
+matched_dfs <- getMatches(
+  dfA = dfA, dfB = dfB, 
+  fl.out = matches.out, threshold.match = 0.85
+)
+```
+
+threshold.match: Lower bound for the posterior probability of a match that will be accepted. Default is 0.85.
+
+Other functions available in the fastLink package:
+
+1. Preprocessing Matches via Blocking: The blockData() function can block two datasets using one or more variables and various blocking techniques.
+
+2. Using Auxiliary Information to Inform fastLink: The algorithm could also incorporate auxiliary information on migration behavior to inform the matching of datasets over time.
+
+3. Aggregating Multiple Matches Together: The algorithm can also aggregate multiple matches into a single summary using the aggregateEM() function.
+
+4. Random Sampling with fastLink: The algorithm allows us to run the matching algorithm on a randomly selected smaller subset of data to be matched and then apply those estimates to the full sample of data.
+
+5. Finding Duplicates within a Dataset via fastLink: The algorithm uses the probabilistic match algorithm to identify duplicated entries.
 
 ## Statistical Analysis Post-Merging
 
