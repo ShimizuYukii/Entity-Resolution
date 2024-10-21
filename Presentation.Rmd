@@ -72,6 +72,12 @@ $$
 
 ## Package Implement
 
+The required package for FastLink is called “fastLink”:
+
+```{r, eval=FALSE}
+install.packages("fastLink")
+```
+
 Install the most recent version of "fastLink" package (version 0.6):
 
 ```{r, eval=FALSE}
