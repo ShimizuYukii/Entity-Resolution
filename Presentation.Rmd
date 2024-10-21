@@ -105,9 +105,10 @@ Run the entire algorithm:
 ```{r, eval=FALSE}
 matches.out <- fastLink(
   dfA = dfA, dfB = dfB, 
-  varnames = c("firstname", "middlename", "lastname", "housenum", "streetname", "city", "birthyear"),
-  stringdist.match = c("firstname", "middlename", "lastname", "streetname", "city"),
-  partial.match = c("firstname", "lastname", "streetname")
+  varnames = c("given_name", "surname", "address_1", "suburb"),
+  stringdist.match = c("given_name", "surname"),
+  partial.match = c("given_name", "surname"),
+  return.all = TRUE
 )
 ```
 
