@@ -77,20 +77,12 @@ $$
 
 ## Package Implement
 
-The required package for FastLink is called "fastLink":
-
-```{r, eval=FALSE}
-install.packages("fastLink")
-```
-
 Install the most recent version of "fastLink" package (version 0.6):
 
 ```{r, eval=FALSE}
 library(devtools)
 install_github("kosukeimai/fastLink",dependencies=TRUE)
 ```
-
-Load the package in R:
 
 ```{r, eval=FALSE}
 ## Load the package and data
@@ -100,8 +92,6 @@ library(fastLink)
 Tutorial Link: https://github.com/kosukeimai/fastLink
 
 ## Package Implement
-
-Run the entire algorithm:
 
 ```{r, eval=FALSE}
 matches.out <- fastLink(
@@ -124,15 +114,15 @@ matched_dfs <- getMatches(
 
 ## Package Implement
 
-- Preprocessing Matches via Blocking: The blockData() function can block two datasets using one or more variables and various blocking techniques.
+- Preprocessing Matches via Blocking
 
-- Using Auxiliary Information to Inform fastLink: The algorithm could also incorporate auxiliary information on migration behavior to inform the matching of datasets over time.
+- Using Auxiliary Information to Inform fastLink
 
-- Aggregating Multiple Matches Together: The algorithm can also aggregate multiple matches into a single summary using the aggregateEM() function.
+- Aggregating Multiple Matches Together
 
-- Random Sampling with fastLink: The algorithm allows us to run the matching algorithm on a randomly selected smaller subset of data to be matched and then apply those estimates to the full sample of data.
+- Random Sampling with fastLink
 
-- Finding Duplicates within a Dataset via fastLink: The algorithm uses the probabilistic match algorithm to identify duplicated entries.
+- Finding Duplicates within a Dataset via fastLink
 
 ## Dataset
 
