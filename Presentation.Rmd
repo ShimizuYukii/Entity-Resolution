@@ -135,7 +135,9 @@ matched_dfs <- getMatches(
 + Avoid overly broad matching criteria / using too many variables
   - Inflate match rate (even over 100%), underestimate False Discovery Rate (FDR) and False Non-match Rate (FNR)
 
-("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/over_match.png")
+```{r, echo=FALSE}
+knitr::include_graphics("https://raw.githubusercontent.com/ShimizuYukii/Entity-Resolution/main/RS%20data/over_match.png")
+```
 
 ## Dataset
 
@@ -144,10 +146,11 @@ matched_dfs <- getMatches(
 + number of matches & jaccard index vs threshold probabilities
   - jaccard index = intersection size / union size
 
-("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/address1%2Bsuburb.png")
-("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/soc_sec_id.png")
-("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/num_match%20vs%20prob.png")
-("https://github.com/ShimizuYukii/Entity-Resolution/blob/main/RS%20data/jaccard%20vs%20prob.png")
+```{r, echo=FALSE}
+knitr::include_graphics("https://raw.githubusercontent.com/ShimizuYukii/Entity-Resolution/main/RS%20data/Picture2.png")
+```
+
+
 
 
 
