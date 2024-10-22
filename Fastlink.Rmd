@@ -169,7 +169,9 @@ Other functions available in the fastLink package:
 
 ## Implementations on Example Datasets
 
-We implemented the FastLink method on two sets of datasets. The first set contains a dataset of products on Amazon with 1364 observations and another dataset of products on Google with 3227 observations.
+We implemented the FastLink method on two sets of datasets. The first set contains a dataset of products on Amazon with 1364 observations and 5 variables ("id","title","description","manufacturer","price"), and another dataset of products on Google with 3227 observations and 5 variables ("id","name","description","manufacturer","price"). Because of the large number of long strings in variables such as "description", "title", and "name", the fastlink algorithm did not work effectively and only produced extremely low number of matches compared to the size of both datasets.
+
+
 
 ## Statistical Analysis Post-Merging
 
