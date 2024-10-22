@@ -171,7 +171,11 @@ Other functions available in the fastLink package:
 
 We implemented the FastLink method on two sets of datasets. The first set contains a dataset of products on Amazon with 1364 observations and 5 variables ("id","title","description","manufacturer","price"), and another dataset of products on Google with 3227 observations and 5 variables ("id","name","description","manufacturer","price"). Because of the large number of long strings in variables such as "description", "title", and "name", the fastlink algorithm did not work effectively and only produced extremely low number of matches compared to the size of both datasets.
 
+The second set of datasets contains a two fictious datasets from Freely Extensible Biomedical Record Linkage, where both contains 5000 observations and the same 10 variables ("given_name", "surname", "street_number", "address_1", "address_2", "suburb", "postcode", "state", "date_of_birth", "soc_sec_id"). Without variables with long string, the algorithm becomes much more effective. However, overly broad matching criteria should be avoided. In this matching example, and through multiple trials, we found that the the match rate will be abnormally inflated (over 100%), with the false discovery rate (the proportion of false positives among all positive predictions made) and the false negative rate (proportion of actual positives that were incorrectly classified as negatives) being greatly underestimated, by including an excessive number of matching variables. In theory, using overly broad matching criteria will indeed inflate match rate and underestimate false positive rate and false negative rate.
 
+For the second set of datasets, we decided to keep "given_name" and "surname" in all the matching attempted as they constitute the foundation of potential matched information. We determined the optimal number of matching variables to be around 3 or 4 (or, 1 or 2 additional variables apart from "given_name" and "surname") and the variables used in string distance matching to be around 2 to 3. We only use the two name variables for partial match. 
+
+It is worth noting that, one could achieve the same level of match rate with fewer matching variables in total by including more informative or powerful matching variables. For example, we obtained lower false positive rate and false negative rate, a higher number of matches (after excluding NAs), and a larger Jaccard index for given threshold probabilities when using "given_name", "surname", and "soc_sec_id" as the 3 matching variables, compared to when using "given_name", "surname", "address_1", and "suburb" as the 4 matching variables (see presentation slides for detailed numbers and visualizations). This could be due to the fact that social security id has a higher predicitve power on the matching outcome than "address_1" and "subrub" combined (geographical location information).
 
 ## Statistical Analysis Post-Merging
 
@@ -179,7 +183,7 @@ We implemented the FastLink method on two sets of datasets. The first set contai
 The model quantifies the uncertainty in the merging process, allowing researchers to account for potential errors in subsequent analyses, which is critical for maintaining the integrity of research conclusions.
 
 ### Post-Merge Analysis
-Discusses methodologies for incorporating the probabilities of matches into regression analyses and other statistical procedures to adjust for the uncertainty inherent in the linkage process.
+Discusses methodologies for incorporating the probabilities of matches into regression analyses and other statistical procedures to adjust for the uncertainty inherent in the linkage process
 
 ## Contributions and Innovations
 
