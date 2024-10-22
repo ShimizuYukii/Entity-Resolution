@@ -167,6 +167,10 @@ Other functions available in the fastLink package:
 
 5. Finding Duplicates within a Dataset via fastLink: The algorithm uses the probabilistic match algorithm to identify duplicated entries.
 
+## Implementations on Example Datasets
+
+We implemented the FastLink method on two sets of datasets. The first set contains 
+
 ## Statistical Analysis Post-Merging
 
 ### Uncertainty Quantification
