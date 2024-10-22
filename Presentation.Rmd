@@ -133,7 +133,7 @@ matched_dfs <- getMatches(
 + Empirical evidence of reduced effectiveness with long strings (e.g., product descriptions)
   - only 75 matches for Amazon (>1000 rows) & Google (>3000 rows) product datasets
 + Avoid overly broad matching criteria / using too many variables
-  - Inflate match rate (even over 100%), underestimate False Discovery Rate (FDR) and False Non-match Rate (FNR)
+  - Inflate match rate (even over 100%), underestimate False Discovery Rate (FDR) and False Negative Rate (FNR)
 
 ```{r, echo=FALSE}
 knitr::include_graphics("https://raw.githubusercontent.com/ShimizuYukii/Entity-Resolution/main/RS%20data/over_match.png")
