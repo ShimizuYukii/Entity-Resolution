@@ -173,6 +173,131 @@ For the second set of datasets, we decided to keep "given_name" and "surname" in
 
 It is worth noting that, one could achieve the same level of match rate with fewer matching variables in total by including more informative or powerful matching variables. For example, we obtained lower false positive rate and false negative rate, a higher number of matches (after excluding NAs), and a larger Jaccard index for given threshold probabilities when using "given_name", "surname", and "soc_sec_id" as the 3 matching variables, compared to when using "given_name", "surname", "address_1", and "suburb" as the 4 matching variables (see presentation slides for detailed numbers and visualizations). This could be due to the fact that social security id has a higher predicitve power on the matching outcome than "address_1" and "subrub" combined (geographical location information).
 
+```{r, eval=FALSE}
+library(dplyr)
+
+dfA <- read.csv("dfA.csv")
+dfB <- read.csv("dfB.csv")
+
+library(devtools)
+library(fastLink)
+
+matches.out <- fastLink(
+  dfA = dfA, dfB = dfB, 
+  varnames = c("given_name", "surname", "address_1", "suburb"),
+  stringdist.match = c("given_name", "surname"),
+  partial.match = c("given_name", "surname"),
+  return.all = TRUE
+)
+
+summary(matches.out)
+
+matches.out1 <- fastLink(
+  dfA = dfA, dfB = dfB, 
+  varnames = c("given_name", "surname", "soc_sec_id"),
+  stringdist.match = c("given_name", "surname", "soc_sec_id"),
+  partial.match = c("given_name", "surname"),
+  return.all = TRUE
+)
+
+summary(matches.out1)
+
+threshold_prob = seq(0.7,0.99,0.01)
+
+dfA.match <- dfA[matches.out$matches$inds.a,]
+dfA.match <- na.omit(dfA.match, select=c("given_name", "surname", "address_1", "suburb"))
+dfB.match <- dfB[matches.out$matches$inds.b,]
+dfB.match <- na.omit(dfB.match, select=c("given_name", "surname", "address_1", "suburb"))
+
+matched_dfs = list()
+num_matches = c()
+
+for(i in seq_along(threshold_prob)){
+matched_dfs[[i]] <- getMatches(
+  dfA = dfA, dfB = dfB, 
+  fl.out = matches.out, threshold.match = threshold_prob[i]
+)
+matched_dfs[[i]] <- na.omit(matched_dfs[[i]], select=c("given_name", "surname", "address_1", "suburb"))
+num_matches[i] <- nrow(matched_dfs[[i]])
+}
+
+num_matches
+
+jaccard_indices = c()
+
+for(i in seq_along(threshold_prob)){
+#intersection_size <- nrow(matched_dfs)
+#union_size <- nrow(dfA) + nrow(dfB) - intersection_size
+
+jaccard_indices[i] <- nrow(matched_dfs[[i]]) / (nrow(dfA) + nrow(dfB) - nrow(matched_dfs[[i]]))
+}
+
+dfA.match1 <- dfA[matches.out1$matches$inds.a,]
+dfA.match1 <- na.omit(dfA.match1, select=c("given_name", "surname", "soc_sec_id"))
+dfB.match1 <- dfB[matches.out1$matches$inds.b,]
+dfB.match1 <- na.omit(dfB.match1, select=c("given_name", "surname", "soc_sec_id"))
+
+matched_dfs1 = list()
+num_matches1 = c()
+
+for(i in seq_along(threshold_prob)){
+matched_dfs1[[i]] <- getMatches(
+  dfA = dfA, dfB = dfB, 
+  fl.out = matches.out1, threshold.match = threshold_prob[i]
+)
+matched_dfs1[[i]] <- na.omit(matched_dfs1[[i]], select=c("given_name", "surname", "soc_sec_id"))
+num_matches1[i] <- nrow(matched_dfs1[[i]])
+}
+
+num_matches1
+
+jaccard_indices1 = c()
+
+for(i in seq_along(threshold_prob)){
+#intersection_size <- nrow(matched_dfs)
+#union_size <- nrow(dfA) + nrow(dfB) - intersection_size
+
+jaccard_indices1[i] <- nrow(matched_dfs1[[i]]) / (nrow(dfA) + nrow(dfB) - nrow(matched_dfs1[[i]]))
+}
+
+library(ggplot2)
+library(scales)
+
+options(digits = 2)
+
+plot_data <- data.frame(threshold_prob, num_matches, num_matches1)
+
+p <- ggplot(plot_data, aes(x = threshold_prob)) + 
+    geom_point(aes(y = num_matches), color = "blue") +  
+    geom_line(aes(y = num_matches), color = "blue") +   
+    geom_point(aes(y = num_matches1), color = "green") + 
+    geom_line(aes(y = num_matches1), color = "green") + 
+    labs(
+        title = "Number of Matches by Threshold Probability (With NAs Removed)",
+        x = "Threshold Probability",
+        y = "Number of Matches"
+    ) +
+    theme_minimal()
+
+print(p)
+
+plot_data <- data.frame(threshold_prob, jaccard_indices, jaccard_indices1)
+
+p <- ggplot(plot_data, aes(x = threshold_prob)) + 
+    geom_point(aes(y = jaccard_indices), color = "blue") +  
+    geom_line(aes(y = jaccard_indices), color = "blue") +   
+    geom_point(aes(y = jaccard_indices1), color = "green") + 
+    geom_line(aes(y = jaccard_indices1), color = "green") + 
+    labs(
+        title = "Jaccard Index by Threshold Probability (With NAs Removed)",
+        x = "Threshold Probability",
+        y = "Jaccard Index"
+    ) +
+    theme_minimal()
+
+print(p)
+```
+
 ## Statistical Analysis Post-Merging
 
 ### Uncertainty Quantification
