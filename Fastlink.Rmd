@@ -4,31 +4,26 @@ author: "Haocheng Qin, Kewei Xu, Zaolin Zhang, Chuhan Guo"
 output:
   pdf_document: default
   html_document: default
-bibliography: references.bib
-link-citations: true
-csl: ieee.csl
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Introduction
-
-FastLink is a entity resolution methodology designed to merge large-scale datasets efficiently, addressing challenges such as missing data, measurement errors, and
-uncertainty in the merging process. Compared to traditional deterministic techniques, which rely on exact matching criteria, FastLink offers more flexibility by leveraging 
-auxiliary information (e.g., name frequency, migration rates) and providing a probabilistic match score. This allows for more accurate linking of records even when data is 
-incomplete or imprecise. Its scalability makes it suitable for handling millions of records, outperforming many existing methods in both speed and accuracy. However, 
-FastLink has limitations when dealing with long strings, such as full names or addresses, where variations and typographical errors can reduce its effectiveness, especially
-without robust string-matching algorithms to support such cases.
-
 ## Methodology
 
-Let's first describe the canonical probabilistic model of record linkage to demonstrate its properties. Materials are from the [original papaer](https://imai.fas.harvard.edu/research/files/linkage-app.pdf) and its [online supplementary](https://imai.fas.harvard.edu/research/files/linkage-app.pdf)
+Literature: https://imai.fas.harvard.edu/research/files/linkage.pdf
 
-Let a latent mixing variable $M_{ij}$ to indicate whether a pair of
-records (for the ith record in the data set A and the jth
-record in the data set B). Notate $\gamma(i,j)$ to be the distance between a pair, just as Fellegi and Sunter did[@fellegi1969], it's changebable but we just use Jaro-Winkler string distance here, which is commonly used[@jaro1989]; and $\delta(i,j)$ to the missing indicator, to deal with missing data, then generally, we are estimating $\xi_{i j} :=\operatorname{Pr}\left(M_{i j}=1 \mid \delta(i, j), \gamma(i, j)\right)$. We can notice that, actually, without the missing indicator, Fastlink would be quite similar to Fellegi-Sunter. Even the assumptions are the same:
+To conclude the methodology section of the paper, the authors developed a fast and scalable probabilistic model designed to merge large-scale administrative records more effectively than traditional deterministic methods. This model, called fastLink, addresses issues such as missing data, measurement error, and the uncertainty inherent in merging processes, which are common in social science research. By incorporating auxiliary information, such as name frequency or migration rates, and allowing for robust simulation studies, the proposed methodology significantly outperforms deterministic approaches. Furthermore, it offers an open-source solution to merge data sets efficiently while providing tools for post-merge analyses that account for the uncertainty of the matching process​
+
+
+Notate $\gamma(i,j)$ to be the distance between a pair, $\delta(i,j)$ to the missing indicator, $M_{ij}$ to be a matrix storing pairing imformation, which is latent, then generally, we are estimating
+
+$$
+\operatorname{Pr}\left(M_{i j}=1 \mid \delta(i, j), \gamma(i, j)\right)
+$$
+
+Then we may merge by thretholding. To achieve this, we make two assumptions for the latent mixing variable $M$
 
 $$
 \begin{aligned}
@@ -37,25 +32,23 @@ $$
 \end{aligned}
 $$
 
-But this can be actually relaxed, we will discuss it later. So addressing missing data would surelly be a significant property of Fastlink. Theoretically, it relies on a missing at random assumption (i.e. $\delta_k(i, j) \perp \gamma_k(i, j) \mid M_{i j}$), but it still works well under some other conditions. With some Bayes calculation (still similar to what Fellegi-Sunter did), actually we can obtain the exact probability to be:
+then we can obtain that
 
 $$
 \begin{aligned}
-\xi_{i j}  =\frac{\lambda \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k \ell \ell}^{1\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}{\sum_{m=0}^1 \lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{1\left\{\gamma_{\ell}(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}
+\xi_{i j} & =\operatorname{Pr}\left(M_{i j}=1 \mid \boldsymbol{\delta}(i, j), \gamma(i, j)\right) \\
+& =\frac{\lambda \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k \ell \ell}^{1\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}{\sum_{m=0}^1 \lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{1\left\{\gamma_{\ell}(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}}
 \end{aligned}
 $$
 
-For the package, this is done by getPosterior(). This introduces us two main advantages: 
-
-Firstly, probabilistic models can quantify the uncertainty inherent in many merge procedures, offering a principled way to calibrate and account for false positives and false negatives. Also for post-merge analysis, such probability works as a good weight for merged variable, i.e. $X^*_i=\sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j} X_j / \sum_{j=1}^{N_{\mathcal{B}}} \xi_{i j}$
-
-Secondly, this proviade an easy way to compute. Intuitively, we can plug in the maximum likelihood estimation of $\lambda$ and $\pi$ here, which is
+Intuitively, we plug in the maximum likelihood estimation of $\lambda$ and $\pi$ here, which is
 
 $$
 L_{c o m}(\lambda, \boldsymbol{\pi} \mid \boldsymbol{\gamma}, \boldsymbol{\delta}) \propto \prod_{i=1}^{N_{A}} \prod_{j=1}^{N_{B}} \prod_{m=0}^1\left\{\lambda^m(1-\lambda)^{1-m} \prod_{k=1}^K\left(\prod_{\ell=0}^{L_k-1} \pi_{k m \ell}^{\mathbf{1}\left\{\gamma_k(i, j)=\ell\right\}}\right)^{1-\delta_k(i, j)}\right\}^{\mathbf{1}\left\{M_{i j}=m\right\}}
 $$
 
-which is hard to compute, but iteratively, we can apply EM (Expectation-Maximization) method[@winkler2000] with 
+which is hard to compute, so iteratively, we apply EM method with 
+
 $$
 \begin{aligned}
 \lambda & =\frac{1}{N_{A} N_{B}} \sum_{i=1}^{N_{A}} \sum_{j=1}^{N_{B}} \xi_{i j} \\
@@ -63,9 +56,8 @@ $$
 \end{aligned}
 $$
 
-together with the calculated $\xi_{ij}$ above. You can find the codes for EM calculations in "emlinkMARmov.R", by codes you can find this package actually allows a prior for the hyperparameters, which is not shown above. 
 
-Actually we can find another function called "emlinklog.R" in the package, this is actually accommodating a more general pattern of interaction. This algorithm allows for the inclusion of interaction terms, that is what I said the assumptions can be relaxed, but without a prior, you can choose it by state "cond.indep = False" in the main function fastlink() according to your requirements, but we will not go through the details of this algorithm here.
+together with the $\xi_{ij}$ above
 
 ## Model Framework and Structures
 
@@ -101,202 +93,9 @@ Repository: https://github.com/kosukeimai/fastLink
 
 Example: https://imai.fas.harvard.edu/research/files/turnout.pdf
 
-## Package Implement
+### Implementation 
 
-The required package for FastLink is called “fastLink”:
-
-```{r, eval=FALSE}
-install.packages("fastLink")
-```
-
-Install the most recent version of "fastLink" package (version 0.6):
-
-```{r, eval=FALSE}
-library(devtools)
-install_github("kosukeimai/fastLink",dependencies=TRUE)
-## Load the package and data
-library(fastLink)
-```
-
-Tutorial Link: https://github.com/kosukeimai/fastLink
-
-## Package Implement
-
-Here we want to merge data frame A and data frame B:
-
-```{r, eval=FALSE}
-matches.out <- fastLink(
-  dfA = dfA, dfB = dfB, 
-  varnames = c("given_name", "surname", "address_1", "suburb"),
-  stringdist.match = c("given_name", "surname"),
-  partial.match = c("given_name", "surname"),
-  return.all = TRUE
-)
-```
-
-varnames: a vector containing the names of variables that will be used for matching, and these variable names must be present in both dfA and dfB.
-
-stringdist.match: a vector of variable names selected from varnames. For the variables included in stringdist.match, agreement will be assessed using the Jaro-Winkler distance.
-
-partial.match: a vector containing variable names that must be part of both stringdist.match and varnames. Variables listed in partial.match will have an additional partial agreement category calculated, alongside the disagreement and full agreement categories, based on the Jaro-Winkler distance.
-
-The merged dataset can be accessed using the getMatches() function:
-
-```{r, eval=FALSE}
-matched_dfs <- getMatches(
-  dfA = dfA, dfB = dfB, 
-  fl.out = matches.out, threshold.match = 0.85
-)
-```
-
-threshold.match: Lower bound for the posterior probability of a match that will be accepted. Default is 0.85.
-
-Other functions available in the fastLink package:
-
-1. Preprocessing Matches via Blocking: The blockData() function can block two datasets using one or more variables and various blocking techniques.
-
-2. Using Auxiliary Information to Inform fastLink: The algorithm could also incorporate auxiliary information on migration behavior to inform the matching of datasets over time.
-
-3. Aggregating Multiple Matches Together: The algorithm can also aggregate multiple matches into a single summary using the aggregateEM() function.
-
-4. Random Sampling with fastLink: The algorithm allows us to run the matching algorithm on a randomly selected smaller subset of data to be matched and then apply those estimates to the full sample of data.
-
-5. Finding Duplicates within a Dataset via fastLink: The algorithm uses the probabilistic match algorithm to identify duplicated entries.
-
-## Implementations on Example Datasets
-
-We implemented the FastLink method on two sets of datasets. The first set contains a dataset of products on Amazon with 1364 observations and 5 variables ("id","title","description","manufacturer","price"), and another dataset of products on Google with 3227 observations and 5 variables ("id","name","description","manufacturer","price"). Because of the large number of long strings in variables such as "description", "title", and "name", the fastlink algorithm did not work effectively and only produced extremely low number of matches compared to the size of both datasets.
-
-The second set of datasets contains a two fictious datasets from Freely Extensible Biomedical Record Linkage, where both contains 5000 observations and the same 10 variables ("given_name", "surname", "street_number", "address_1", "address_2", "suburb", "postcode", "state", "date_of_birth", "soc_sec_id"). Without variables with long string, the algorithm becomes much more effective. However, overly broad matching criteria should be avoided. In this matching example, and through multiple trials, we found that the the match rate will be abnormally inflated (over 100%), with the false discovery rate (the proportion of false positives among all positive predictions made) and the false negative rate (proportion of actual positives that were incorrectly classified as negatives) being greatly underestimated, by including an excessive number of matching variables. In theory, using overly broad matching criteria will indeed inflate match rate and underestimate false positive rate and false negative rate.
-
-For the second set of datasets, we decided to keep "given_name" and "surname" in all the matching attempted as they constitute the foundation of potential matched information. We determined the optimal number of matching variables to be around 3 or 4 (or, 1 or 2 additional variables apart from "given_name" and "surname") and the variables used in string distance matching to be around 2 to 3. We only use the two name variables for partial match. 
-
-It is worth noting that, one could achieve the same level of match rate with fewer matching variables in total by including more informative or powerful matching variables. For example, we obtained lower false positive rate and false negative rate, a higher number of matches (after excluding NAs), and a larger Jaccard index for given threshold probabilities when using "given_name", "surname", and "soc_sec_id" as the 3 matching variables, compared to when using "given_name", "surname", "address_1", and "suburb" as the 4 matching variables (see presentation slides for detailed numbers and visualizations). This could be due to the fact that social security id has a higher predicitve power on the matching outcome than "address_1" and "subrub" combined (geographical location information).
-
-```{r, eval=FALSE}
-library(dplyr)
-
-dfA <- read.csv("dfA.csv")
-dfB <- read.csv("dfB.csv")
-
-library(devtools)
-library(fastLink)
-
-matches.out <- fastLink(
-  dfA = dfA, dfB = dfB, 
-  varnames = c("given_name", "surname", "address_1", "suburb"),
-  stringdist.match = c("given_name", "surname"),
-  partial.match = c("given_name", "surname"),
-  return.all = TRUE
-)
-
-summary(matches.out)
-
-matches.out1 <- fastLink(
-  dfA = dfA, dfB = dfB, 
-  varnames = c("given_name", "surname", "soc_sec_id"),
-  stringdist.match = c("given_name", "surname", "soc_sec_id"),
-  partial.match = c("given_name", "surname"),
-  return.all = TRUE
-)
-
-summary(matches.out1)
-
-threshold_prob = seq(0.7,0.99,0.01)
-
-dfA.match <- dfA[matches.out$matches$inds.a,]
-dfA.match <- na.omit(dfA.match, select=c("given_name", "surname", "address_1", "suburb"))
-dfB.match <- dfB[matches.out$matches$inds.b,]
-dfB.match <- na.omit(dfB.match, select=c("given_name", "surname", "address_1", "suburb"))
-
-matched_dfs = list()
-num_matches = c()
-
-for(i in seq_along(threshold_prob)){
-matched_dfs[[i]] <- getMatches(
-  dfA = dfA, dfB = dfB, 
-  fl.out = matches.out, threshold.match = threshold_prob[i]
-)
-matched_dfs[[i]] <- na.omit(matched_dfs[[i]], select=c("given_name", "surname", "address_1", "suburb"))
-num_matches[i] <- nrow(matched_dfs[[i]])
-}
-
-num_matches
-
-jaccard_indices = c()
-
-for(i in seq_along(threshold_prob)){
-#intersection_size <- nrow(matched_dfs)
-#union_size <- nrow(dfA) + nrow(dfB) - intersection_size
-
-jaccard_indices[i] <- nrow(matched_dfs[[i]]) / (nrow(dfA) + nrow(dfB) - nrow(matched_dfs[[i]]))
-}
-
-dfA.match1 <- dfA[matches.out1$matches$inds.a,]
-dfA.match1 <- na.omit(dfA.match1, select=c("given_name", "surname", "soc_sec_id"))
-dfB.match1 <- dfB[matches.out1$matches$inds.b,]
-dfB.match1 <- na.omit(dfB.match1, select=c("given_name", "surname", "soc_sec_id"))
-
-matched_dfs1 = list()
-num_matches1 = c()
-
-for(i in seq_along(threshold_prob)){
-matched_dfs1[[i]] <- getMatches(
-  dfA = dfA, dfB = dfB, 
-  fl.out = matches.out1, threshold.match = threshold_prob[i]
-)
-matched_dfs1[[i]] <- na.omit(matched_dfs1[[i]], select=c("given_name", "surname", "soc_sec_id"))
-num_matches1[i] <- nrow(matched_dfs1[[i]])
-}
-
-num_matches1
-
-jaccard_indices1 = c()
-
-for(i in seq_along(threshold_prob)){
-#intersection_size <- nrow(matched_dfs)
-#union_size <- nrow(dfA) + nrow(dfB) - intersection_size
-
-jaccard_indices1[i] <- nrow(matched_dfs1[[i]]) / (nrow(dfA) + nrow(dfB) - nrow(matched_dfs1[[i]]))
-}
-
-library(ggplot2)
-library(scales)
-
-options(digits = 2)
-
-plot_data <- data.frame(threshold_prob, num_matches, num_matches1)
-
-p <- ggplot(plot_data, aes(x = threshold_prob)) + 
-    geom_point(aes(y = num_matches), color = "blue") +  
-    geom_line(aes(y = num_matches), color = "blue") +   
-    geom_point(aes(y = num_matches1), color = "green") + 
-    geom_line(aes(y = num_matches1), color = "green") + 
-    labs(
-        title = "Number of Matches by Threshold Probability (With NAs Removed)",
-        x = "Threshold Probability",
-        y = "Number of Matches"
-    ) +
-    theme_minimal()
-
-print(p)
-
-plot_data <- data.frame(threshold_prob, jaccard_indices, jaccard_indices1)
-
-p <- ggplot(plot_data, aes(x = threshold_prob)) + 
-    geom_point(aes(y = jaccard_indices), color = "blue") +  
-    geom_line(aes(y = jaccard_indices), color = "blue") +   
-    geom_point(aes(y = jaccard_indices1), color = "green") + 
-    geom_line(aes(y = jaccard_indices1), color = "green") + 
-    labs(
-        title = "Jaccard Index by Threshold Probability (With NAs Removed)",
-        x = "Threshold Probability",
-        y = "Jaccard Index"
-    ) +
-    theme_minimal()
-
-print(p)
-```
+Dataset: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/2NNA4L
 
 ## Statistical Analysis Post-Merging
 
@@ -304,7 +103,7 @@ print(p)
 The model quantifies the uncertainty in the merging process, allowing researchers to account for potential errors in subsequent analyses, which is critical for maintaining the integrity of research conclusions.
 
 ### Post-Merge Analysis
-Discusses methodologies for incorporating the probabilities of matches into regression analyses and other statistical procedures to adjust for the uncertainty inherent in the linkage process
+Discusses methodologies for incorporating the probabilities of matches into regression analyses and other statistical procedures to adjust for the uncertainty inherent in the linkage process.
 
 ## Contributions and Innovations
 
@@ -313,13 +112,10 @@ The model makes substantial contributions to the field of data management by pro
 - Enhanced handling of missing data and the independence assumptions of linkage variables, which have been a significant limitation in earlier models.
 - Detailed documentation and an accessible implementation in R, which facilitates reproducible research and widespread adoption in the social sciences.
 
-```{r,warning=FALSE}
+```{r}
 suppressMessages(require("fastLink"))
 suppressMessages(require("plyr"))
 data <- read.delim("cces2016voterval.tab")
 summary(data)
 ```
 
-## References
-
-<div id="refs"></div>
