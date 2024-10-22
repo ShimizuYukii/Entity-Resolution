@@ -139,7 +139,7 @@ matched_dfs <- getMatches(
 dir.create(file.path('RS_data'), showWarnings = FALSE)
 if (!file.exists("RS_data/over_match.png")) {
   dir.create(file.path('RS_data'), showWarnings = FALSE)
-  download.file("https://raw.githubusercontent.com/ShimizuYukii/Entity-Resolution/main/RS%20data/over_match.png", 
+  download.file("https://raw.githubusercontent.com/ShimizuYukii/Entity-Resolution/main/RS_data/over_match.png", 
                 destfile = "RS_data/over_match.png", mode = "wb")
 }
 knitr::include_graphics("RS_data/over_match.png")
@@ -154,7 +154,7 @@ knitr::include_graphics("RS_data/over_match.png")
 
 ```{r, echo=FALSE, out.width='200px'}
 if (!file.exists("RS_data/Picture2.png")) {
-  download.file("https://raw.githubusercontent.com/ShimizuYukii/Entity-Resolution/main/RS%20data/Picture2.png", 
+  download.file("https://raw.githubusercontent.com/ShimizuYukii/Entity-Resolution/main/RS_data/Picture2.png", 
                 destfile = "RS_data/Picture2.png", mode = "wb")
 }
 knitr::include_graphics("RS_data/Picture2.png")
