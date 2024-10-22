@@ -24,11 +24,7 @@ without robust string-matching algorithms to support such cases.
 
 ## Methodology
 
-Let's first describe the canonical probabilistic model of record linkage to demonstrate its properties. Materials are from the 
-
-original papaer: https://imai.fas.harvard.edu/research/files/linkage-app.pdf 
-
-and its online supplementary: https://imai.fas.harvard.edu/research/files/linkage-app.pdf
+Let's first describe the canonical probabilistic model of record linkage to demonstrate its properties. Materials are from the [original papaer](https://imai.fas.harvard.edu/research/files/linkage-app.pdf) and its [online supplementary](https://imai.fas.harvard.edu/research/files/linkage-app.pdf)
 
 Let a latent mixing variable $M_{ij}$ to indicate whether a pair of
 records (for the ith record in the data set A and the jth
