@@ -169,7 +169,7 @@ Other functions available in the fastLink package:
 
 ## Implementations on Example Datasets
 
-We implemented the FastLink method on two sets of datasets. The first set contains 
+We implemented the FastLink method on two sets of datasets. The first set contains a dataset of products on Amazon with 1364 observations and another dataset of products on Google with 3227 observations.
 
 ## Statistical Analysis Post-Merging
 
